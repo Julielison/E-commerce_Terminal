@@ -1,3 +1,5 @@
+# Em manutenção
+
 from produto import Produto
 
 # Armazena os produtos por categoria

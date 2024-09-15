@@ -1,9 +1,6 @@
 import threading
 import socket
 import sys
-import os
-import time
-
 
 
 class Servidor:
@@ -11,7 +8,6 @@ class Servidor:
         self.host = 'localhost'
         self.port = 55550
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.estoque = dict()	 #Dicionário que armazena o estoque (Implementar um arquivo para armazenar o estoque, para que não seja perdido ao fechar o programa, e carregar o estoque ao abrir o programa novamente) Implementar Estrutura de HASHMAP 
         self.commands = {'1':self.listarEstoque, '5':sys.exit}
 
 
@@ -51,5 +47,3 @@ if __name__ == '__main__':
     servidor = Servidor()
     servidor.start()
     servidor.interface()
-
-
