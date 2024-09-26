@@ -1,5 +1,4 @@
-from listaEncadeada import Lista
-import json
+from Servidor.Estruturas.listaEncadeada import Lista
 
 '''
 Classe usada para criar um objeto produto.
