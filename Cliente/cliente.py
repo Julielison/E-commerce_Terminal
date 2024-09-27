@@ -35,5 +35,3 @@ class Cliente:
 if __name__ == '__main__':
     cliente = Cliente()
     cliente.start()
-
-
