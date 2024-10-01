@@ -1,6 +1,6 @@
 import threading
 import socket
-import sys
+from protocolo import Protocolo
 
 
 class Servidor:
@@ -8,15 +8,12 @@ class Servidor:
         self.host = 'localhost'
         self.port = 55550
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.commands = {'1':self.listarEstoque, '5':sys.exit}
-
 
 
     def start (self): # Inicia o servidor
         self.socket.bind((self.host, self.port))
         self.socket.listen(1)
         print('Servidor executando na porta: ', self.port)
-        self.interface()
         while True:
             conn, addr = self.socket.accept()
             print('Conectado a', addr)
@@ -24,26 +21,35 @@ class Servidor:
             
 
     def handle_client(self, conn): # Trata a conexão com o cliente e executa os comandos recebidos do cliente(Cria uma thread para cada cliente)
-        interface = 'Bem vindo ao SuperMercadao\n1-Listar Estoque\n'
-        conn.sendall(interface.encode())
 
         while True:
             data = conn.recv(1024)
-            if not data:
+            data = data.decode()
+            print('Recebido:', data)
+
+            entidade = None
+            dados_separados = data.split()
+            método = dados_separados[0]
+        
+            if len(dados_separados) > 1:
+                entidade = dados_separados[1]
+
+            if método == 'SAIR':
                 break
-            print('Recebido:', data.decode())
-            if data.decode() in self.commands:
-                resultado = self.commands[data.decode()]()
-                conn.sendall(str(resultado).encode())
-        
-            else:
-                print('Comando inválido. Tente novamente.')
-        
-            conn.sendall(data)
+
+            try:
+                processar_no_estoque = Protocolo.mapear_função(método)
+                if entidade != None:
+                    resultado = processar_no_estoque(entidade)
+                else:
+                    resultado = processar_no_estoque()
+            except Exception as e:
+                pass
+
+            conn.sendall(resultado)
         conn.close()
 
 
 if __name__ == '__main__':
     servidor = Servidor()
     servidor.start()
-    servidor.interface()
