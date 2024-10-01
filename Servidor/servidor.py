@@ -1,6 +1,7 @@
 import threading
 import socket
 from protocolo import Protocolo
+from Estoque.estoque import Estoque
 
 
 class Servidor:
@@ -27,29 +28,37 @@ class Servidor:
             data = data.decode()
             print('Recebido:', data)
 
-            entidade = None
+            corpo_entidade = None
             dados_separados = data.split()
             método = dados_separados[0]
         
             if len(dados_separados) > 1:
-                entidade = dados_separados[1]
+                corpo_entidade = dados_separados[1]
 
             if método == 'SAIR':
                 break
 
+            resultado = processar_requisição(método, corpo_entidade)
+
+            conn.sendall(resultado.encode())
+        conn.close()
+
+
+        def processar_requisição(método: str, corpo_entidade: str) -> str:
             try:
                 processar_no_estoque = Protocolo.mapear_função(método)
-                if entidade != None:
-                    resultado = processar_no_estoque(entidade)
+                if corpo_entidade != None:
+                    resultado = processar_no_estoque(corpo_entidade)
                 else:
                     resultado = processar_no_estoque()
             except Exception as e:
-                pass
-
-            conn.sendall(resultado)
-        conn.close()
+                print(e)
+            return resultado
 
 
 if __name__ == '__main__':
     servidor = Servidor()
     servidor.start()
+    estoque = Estoque()
+    estoque.preencher()
+    Protocolo.criar(estoque)
