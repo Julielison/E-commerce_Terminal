@@ -43,11 +43,7 @@ class Servidor:
 
             conn.sendall(resultado.encode())
         conn.close()
-
-    def teste(self, cle):
-        print(f'Cliente {cle} acessando estoque')
-        time.sleep(10)
-        return 'retornou'
+        
 
     def processar_requisição(self, método: str, corpo_entidade: str) -> str:
         try:

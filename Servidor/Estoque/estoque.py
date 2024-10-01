@@ -84,9 +84,9 @@ class Estoque:
     
     def pegar_produtos_da_categoria(self, categoria: str) -> str:
         resultado = ''
-        for produto in self.estoque.values():
+        for id, produto in self.estoque.items():
             if produto.categoria == categoria:
-                resultado += self.__montar_string_produto(produto)
+                resultado += self.__montar_string_produto(id, produto)
 
         if resultado == '':
             raise Exception("Sem_produtos_para_essa_categoria")
