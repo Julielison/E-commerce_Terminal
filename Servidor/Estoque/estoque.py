@@ -1,3 +1,4 @@
+import re
 from Servidor.Estoque.categoria import Categoria
 from Servidor.Estoque.sql import Sql
 from Servidor.Estruturas.LinearProbingLoadFactor import HashTable
@@ -6,7 +7,12 @@ from Servidor.Estoque.produto import Produto
 import csv
 import sqlite3
 
-
+class EstoqueErro(Exception):
+    """Exceção personalizada para erros específicos na aplicação."""
+    
+    def __init__(self, mensagem: str):
+        super().__init__(mensagem)
+        self.mensagem = mensagem
 
 
 class Estoque:
@@ -55,51 +61,89 @@ class Estoque:
 
 
     def pegar_categorias(self) -> str:
-        string = ''
+        resultado = ''
         for cat in self.categorias:
-            string += cat.nome
-        return string
+            resultado += f'{cat.nome},'
+        return resultado.rtrip(',')
             
 
-    def pegar_produtos(self, inicio = 1) -> str:
+    def pegar_produtos(self, id_inicio = 1) -> str:
         qtd = Estoque.qtd_produtos
+        total = 10
 
-        if inicio > qtd:
-            raise Exception('Sem mais produtos')
-        string = ''
+        if id_inicio+total > qtd:
+            raise Exception('Sem_produtos_para_exibir.')
+        
+        resultado = ''
+        cont = 0
+        while cont <= total and id_inicio <= qtd:
+                try:
+                    produto = self.estoque.get(id_inicio)
+                except:
+                    id_inicio += 1
+                    continue
+                resultado += self.__montar_string_produto(id_inicio, produto)
+                cont += 1
+        
+        return resultado.rstrip(',')
 
-        for i in range(inicio, qtd+1):
+    
+    def pegar_produtos_da_categoria(self, categoria: str) -> str:
+        resultado = ''
+        for produto in self.estoque.values():
+            if produto.categoria == categoria:
+                resultado += self.__montar_string_produto(produto)
+
+        if resultado == '':
+            raise Exception("Sem_produtos_para_essa_categoria")
+        
+        return resultado.rstrip(',')
+
+
+    def pesquisar_produto(self, nome: str) -> str:
+        padrao = re.compile(rf'\b{re.escape(nome)}\b', re.IGNORECASE)
+        resultado = ''
+    
+        # Verificar se há uma correspondência
+        for id in self.estoque.keys():
             try:
-                self.estoque.get()
+                produto = self.estoque.get(id)
+            except:
+                continue
+            if padrao.search(produto.nome):
+                resultado += self.__montar_string_produto(id, produto)
+
+        return resultado.rstrip(',')
+
+    def __montar_string_produto(self, id: str, produto: Produto) -> str:
+        return f'{id}:{produto.nome}.{produto.preco}.{produto.quantidade},'
+
 
     def comprar_produtos(self, dados: str) -> str:
         '''
-        Formato dos dados: categoria;id.quantidade;id.quantidade,categoria;id.quantidade ...
+            id_produto:quant,id_produto,quant
         '''
         resultado = ''
-        esgotados = []
-        limitados = {}
-        comprados = {}
+        flag = False
+
+        prod_qtd = dados.split(',')
+        for e in prod_qtd:
+            id, qtd = e.split(':'),
+            try:
+                produto = self.estoque.get(id)
+            except:
+                flag = True
+                continue
+
+            if qtd > produto.quantidade:
+                resultado += f'{id}:{qtd},'
+                flag = True
+
+            produto.quantidade -= 1
+            if produto.quantidade == 0:
+                self.estoque.remove(id)
         
-        # Processar os dados (exemplo de como eles podem ser divididos)
-        categorias_dados = dados.split(',')
-        for categoria_dados in categorias_dados:
-            categoria, *ids_e_qtds = categoria_dados.split(';')
-            for id_qtd in ids_e_qtds:
-                id, qtd = map(int, id_qtd.split('.'))
-                produto = self.obter_produto(categoria, id)  # Obter produto pelo id e categoria
+        if flag:
+            raise Exception('Quantidade_ou_produto_indisponível ' + resultado)
 
-                if produto.quantidade == 0:
-                    esgotados.append(id)
-                elif produto.quantidade < qtd:
-                    limitados[id] = produto.quantidade
-                else:
-                    produto.quantidade -= qtd  # Reduzir a quantidade
-                    comprados[id] = qtd  # Registrar o produto comprado
-
-        resposta = {'comprados': comprados, 'limitados': limitados, 'esgotados': esgotados}
-        return json.dumps(resposta)
-
-    def obter_produto(self, categoria: str, id: int) -> Produto:
-        """ Método para obter um produto específico dado a categoria e o ID. """
-        return self.estoque[categoria][id]
+        return resultado.rstrip(',')

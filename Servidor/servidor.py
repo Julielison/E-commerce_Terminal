@@ -57,8 +57,11 @@ class Servidor:
                 resultado = processar_no_estoque(corpo_entidade)
             else:
                 resultado = processar_no_estoque()
-        except Exception as e:
-            resultado = e
+            codigo = Protocolo.obter_código_sucesso(método)
+        except Exception as mensagem:
+            codigo = Protocolo.obter_código_erro(método)
+            
+        resultado = Protocolo.montar_mensagem(codigo, mensagem, resultado)
         return resultado
 
 
@@ -67,4 +70,4 @@ if __name__ == '__main__':
     servidor.start()
     estoque = Estoque()
     estoque.preencher()
-    Protocolo.criar(estoque)
+    Protocolo.carrregar_dados(estoque)
