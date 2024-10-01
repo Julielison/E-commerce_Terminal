@@ -1,13 +1,14 @@
-from Servidor.Estruturas.listaEncadeada import Lista
+from .categoria import Categoria
 
 '''
 Classe usada para criar um objeto produto.
 '''
 class Produto:
-    def __init__(self, nome: str, preco: float, quantidade: int) -> None:
+    def __init__(self, nome: str, preco: float, quantidade: int, categoria: Categoria) -> None:
         self.__nome = nome
         self.__preco = preco
         self.__quantidade = quantidade
+        self.__categoria = categoria
 
 
     # Propriedade para nome
@@ -48,54 +49,6 @@ class Produto:
         self.__quantidade = quantidade
 
 
-
-'''
-A classe abaixo visa otimizar a obtenção dos dados de um produto quando o cliente envia uma requisição de compra.
-'''
-class Produtos:
-    __produtos = {} # Implementar na HashTable fornecida pelo professor
-    __contador = 0
-
-    @classmethod
-    def obter_produtos(cls) -> dict:
-        return cls.__produtos
-    
-    @classmethod
-    def adicionar_produto(cls, produto: Produto) -> None:
-        cls.__produtos[cls.__contador+1] = produto
-
-    @classmethod
-    def obter_produto(cls, id: int) -> any:
-        try:
-            return cls[id]
-        except KeyError:
-            print(f'O produto com id {id} não está mais disponível.')
-
-
-    '''
-    Cenários:
-        quantidade fornecida maior que o disponível
-        produto indisponível
-    '''
-    @classmethod
-    def comprar_produtos(cls, ids_qtds: json) -> str:
-        ids_e_qtds = json.loads(ids_qtds)
-        comprados = Lista()
-        esgotados = Lista()
-        limitados = {} # Implementar com hashtable fornecida
-
-        for id, qtd in ids_e_qtds.items():
-            produto = cls.obter_produto(id)
-
-            if produto.quantidade == 0:
-                esgotados.append(id)
-
-            elif produto.quantidade < qtd:
-                limitados[id] = produto.quantidade
-
-            else:
-                produto.quantidade -= 1
-                comprados.append(id)
-        
-        resposta = {'comprados': comprados, 'limitados': limitados, 'esgotados': esgotados}
-        return json.dumps(resposta)
+    @property
+    def categoria(self) -> str:
+        return self.__categoria.nome
