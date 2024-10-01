@@ -27,7 +27,7 @@ class Cliente:
     def receive_message(self): # Recebe mensagens do servidor
         while True:
             data = self.socket.recv(1024)
-            print('Recebido:', data.decode().split('##'))
+            print('Recebido:', data.decode().split('@#'))
             if data.decode() == 'exit':
                 self.socket.close()
                 break

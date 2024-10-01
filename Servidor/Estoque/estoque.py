@@ -59,9 +59,9 @@ class Estoque:
     def pegar_categorias(self) -> str:
         resultado = ''
         for i in range(1, Estoque.qtd_categprias+1):
-            resultado += f'{self.categorias.elemento(i).nome}##'
+            resultado += f'{self.categorias.elemento(i).nome}#'
 
-        return resultado.rstrip('##')
+        return resultado.rstrip('#')
             
 
     def pegar_produtos(self, id_inicio = 0) -> str:
@@ -122,7 +122,6 @@ class Estoque:
 
     def comprar(self, dados: str) -> str:
         '''
-            id_produto##quant,id_produto##quant
         '''
         resultado = ''
         flag = False
