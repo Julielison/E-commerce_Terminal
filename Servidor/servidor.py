@@ -40,7 +40,6 @@ class Servidor:
             # Aqui usamos o semáforo para controlar o acesso ao estoque
             with self.semaforo:
                 resultado = self.processar_requisição(método, corpo_entidade)
-            print('FInalizou')
 
             conn.sendall(resultado.encode())
         conn.close()
@@ -57,17 +56,16 @@ class Servidor:
                 resultado = processar_no_estoque(corpo_entidade)
             else:
                 resultado = processar_no_estoque()
-            codigo = Protocolo.obter_código_sucesso(método)
+            resultado = Protocolo.montar_resposta_sucesso(método, resultado)
         except Exception as mensagem:
-            codigo = Protocolo.obter_código_erro(método)
+            resultado = Protocolo.montar_resposta_erro(método, str(mensagem))
             
-        resultado = Protocolo.montar_mensagem(codigo, mensagem, resultado)
         return resultado
 
 
 if __name__ == '__main__':
-    servidor = Servidor()
-    servidor.start()
     estoque = Estoque()
     estoque.preencher()
-    Protocolo.carrregar_dados(estoque)
+    Protocolo.carregar_protocolo_padrão(estoque)
+    servidor = Servidor()
+    servidor.start()

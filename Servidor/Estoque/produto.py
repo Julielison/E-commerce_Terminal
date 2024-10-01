@@ -1,5 +1,4 @@
-from Servidor.Estruturas.listaEncadeada import Lista
-from categoria import Categoria
+from .categoria import Categoria
 
 '''
 Classe usada para criar um objeto produto.

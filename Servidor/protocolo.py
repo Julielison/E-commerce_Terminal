@@ -1,5 +1,6 @@
+import csv
 from Estruturas.LinearProbingLoadFactor import HashTable
-from Estoque.estoque import Estoque
+
 
 class Protocolo:
     métodos = HashTable()
@@ -7,23 +8,27 @@ class Protocolo:
     @classmethod
     def mapear_função(cls, metodo: str) -> any:
         return cls.métodos[metodo][0]
-    
-    @classmethod
-    def obter_código_sucesso(cls, metodo: str) -> any:
-        return cls.métodos[metodo][1]
-    
-    @classmethod
-    def obter_código_erro(cls, metodo: str) -> str:
-        return cls.métodos[metodo][2]
         
     @classmethod
-    def carregar_dados(cls, estoque) -> None:
-        
-        cls.métodos.put('PEGAR_PRODUTOS', (estoque.pegar_produtos, 'PROD-220'))
-        cls.métodos.put('PEGAR_CATEGORIAS', (estoque.pegar_categorias, 'CATE-221'))
-        cls.métodos.put('PEGAR_PRODUTOS_DA_CATEGORIA', (estoque.pegar_produtos_da_categoria, 'PRCA-222'))
-        cls.métodos.put('COMPRAR', (estoque.comprar_produtos, 'COMP-223'))
+    def carregar_protocolo_padrão(cls, objeto) -> None:
+        with open('Servidor/protocolo.csv', mode='r', encoding='utf-8') as arquivo:
+            leitor_csv = csv.reader(arquivo)
+            
+            # Pular o cabeçalho
+            next(leitor_csv)
+            
+            # Iterar pelas linhas do arquivo
+            for linha in leitor_csv:
+                print(linha)
+                metodo, codigo_sucesso, codigo_erro = linha
+                método_estoque = getattr(objeto, metodo.lower())
+                cls.métodos[metodo] = (método_estoque, codigo_sucesso, codigo_erro)
 
     @classmethod
-    def montar_mensagem(cls, código_resposta:str, mensagem: str = '', resultado = '') -> str:
-        return codigo
+    def montar_resposta_sucesso(cls, método:str, resultado: str) -> str:
+        return cls.métodos[método][1] + '@#' + resultado
+    
+    @classmethod
+    def montar_resposta_erro(cls, método:str, mensagem: str) -> str:
+        print(método)
+        return cls.métodos[método][2] + '@#' +  mensagem

@@ -1,6 +1,6 @@
 class Sql:
     @classmethod
-    def produtos_por_categoria():
+    def produtos_por_categoria(cls):
         return '''
                 SELECT Produtos.id, Produtos.nome, Produtos.preco, Produtos.quantidade
                 FROM Produtos
@@ -9,5 +9,5 @@ class Sql:
                 '''
     
     @classmethod
-    def categorias():
+    def categorias(cls):
         return 'SELECT nome FROM Categoria'

@@ -1,18 +1,10 @@
 import re
-from Servidor.Estoque.categoria import Categoria
-from Servidor.Estoque.sql import Sql
-from Servidor.Estruturas.LinearProbingLoadFactor import HashTable
-from Servidor.Estruturas.listaEncadeada import Lista
-from Servidor.Estoque.produto import Produto
-import csv
+from .categoria import Categoria
+from .sql import Sql
+from Estruturas.LinearProbingLoadFactor import HashTable
+from Estruturas.listaEncadeada import Lista
+from Estoque.produto import Produto
 import sqlite3
-
-class EstoqueErro(Exception):
-    """Exceção personalizada para erros específicos na aplicação."""
-    
-    def __init__(self, mensagem: str):
-        super().__init__(mensagem)
-        self.mensagem = mensagem
 
 
 class Estoque:
@@ -23,9 +15,8 @@ class Estoque:
 
     def preencher(self) -> None:
         # Conectar ao banco de dados SQLite
-        conn = sqlite3.connect('./data_base.db')
+        conn = sqlite3.connect('Servidor\Estoque\data_base.db')
         cursor = conn.cursor()
-
         comando = Sql.categorias()
 
         # Executar um SELECT para pegar todos os nomes das categorias
@@ -34,9 +25,11 @@ class Estoque:
         # Recuperar os resultados
         categorias = cursor.fetchall()
 
+        i = 1
         for cat in categorias:
             categoria = Categoria(cat[0])
-            self.categorias.inserir(categoria)  # Adicionar a categoria à lista
+            self.categorias.inserir(i, categoria)
+            i += 1
 
             comando = Sql.produtos_por_categoria()
 
@@ -63,11 +56,12 @@ class Estoque:
     def pegar_categorias(self) -> str:
         resultado = ''
         for cat in self.categorias:
-            resultado += f'{cat.nome},'
+            resultado += f'{cat.nome}##'
         return resultado.rtrip(',')
             
 
-    def pegar_produtos(self, id_inicio = 1) -> str:
+    def pegar_produtos(self, id_inicio = 0) -> str:
+        id_inicio = int(id_inicio)
         qtd = Estoque.qtd_produtos
         total = 10
 
@@ -76,11 +70,11 @@ class Estoque:
         
         resultado = ''
         cont = 0
-        while cont <= total and id_inicio <= qtd:
+        while cont < total and id_inicio <= qtd:
+                id_inicio += 1
                 try:
                     produto = self.estoque.get(id_inicio)
                 except:
-                    id_inicio += 1
                     continue
                 resultado += self.__montar_string_produto(id_inicio, produto)
                 cont += 1
@@ -112,14 +106,17 @@ class Estoque:
                 continue
             if padrao.search(produto.nome):
                 resultado += self.__montar_string_produto(id, produto)
+        
+        if resultado == '':
+            raise Exception('Nenhum produto encontrado.')
 
         return resultado.rstrip(',')
 
     def __montar_string_produto(self, id: str, produto: Produto) -> str:
-        return f'{id}:{produto.nome}.{produto.preco}.{produto.quantidade},'
+        return f'{id}#{produto.nome}#{produto.preco}#{produto.quantidade}##'
 
 
-    def comprar_produtos(self, dados: str) -> str:
+    def comprar(self, dados: str) -> str:
         '''
             id_produto:quant,id_produto,quant
         '''
@@ -132,18 +129,18 @@ class Estoque:
             try:
                 produto = self.estoque.get(id)
             except:
-                flag = True
+                resultado += f'{id}:{0},'
                 continue
 
             if qtd > produto.quantidade:
-                resultado += f'{id}:{qtd},'
+                resultado += f'{id}:{produto.quantidade},'
                 flag = True
 
             produto.quantidade -= 1
             if produto.quantidade == 0:
                 self.estoque.remove(id)
-        
-        if flag:
-            raise Exception('Quantidade_ou_produto_indisponível ' + resultado)
 
-        return resultado.rstrip(',')
+        if flag:
+            raise Exception('Quantidade_ou_produto_indisponível ' + resultado.rstrip(','))
+
+        return 'Compra finalizada'
