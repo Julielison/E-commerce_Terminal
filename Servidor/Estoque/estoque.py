@@ -126,7 +126,6 @@ class Estoque:
         '''
         resultado = ''
         flag = False
-        print(dados)
 
         prod_qtd = dados
 
