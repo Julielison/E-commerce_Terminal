@@ -9,6 +9,8 @@ import sqlite3
 
 class Estoque:
     qtd_produtos = 0
+    qtd_categprias = 0
+
     def __init__(self):
         self.estoque = HashTable()
         self.categorias = Lista()
@@ -24,12 +26,15 @@ class Estoque:
 
         # Recuperar os resultados
         categorias = cursor.fetchall()
+        print(categorias)
 
         i = 1
         for cat in categorias:
-            categoria = Categoria(cat[0])
+            print(cat)
+            categoria = Categoria(str(cat[0]))
             self.categorias.inserir(i, categoria)
             i += 1
+            Estoque.qtd_categprias += 1
 
             comando = Sql.produtos_por_categoria()
 
@@ -55,9 +60,10 @@ class Estoque:
 
     def pegar_categorias(self) -> str:
         resultado = ''
-        for cat in self.categorias:
-            resultado += f'{cat.nome}##'
-        return resultado.rtrip(',')
+        for i in range(1, Estoque.qtd_categprias+1):
+            resultado += f'{self.categorias.elemento(i).nome}##'
+
+        return resultado.rstrip('##')
             
 
     def pegar_produtos(self, id_inicio = 0) -> str:
@@ -79,7 +85,7 @@ class Estoque:
                 resultado += self.__montar_string_produto(id_inicio, produto)
                 cont += 1
         
-        return resultado.rstrip(',')
+        return resultado.rstrip('##')
 
     
     def pegar_produtos_da_categoria(self, categoria: str) -> str:
@@ -91,7 +97,7 @@ class Estoque:
         if resultado == '':
             raise Exception("Sem_produtos_para_essa_categoria")
         
-        return resultado.rstrip(',')
+        return resultado.rstrip('##')
 
 
     def pesquisar_produto(self, nome: str) -> str:
@@ -110,7 +116,7 @@ class Estoque:
         if resultado == '':
             raise Exception('Nenhum produto encontrado.')
 
-        return resultado.rstrip(',')
+        return resultado.rstrip('##')
 
     def __montar_string_produto(self, id: str, produto: Produto) -> str:
         return f'{id}#{produto.nome}#{produto.preco}#{produto.quantidade}##'
@@ -141,6 +147,6 @@ class Estoque:
                 self.estoque.remove(id)
 
         if flag:
-            raise Exception('Quantidade_ou_produto_indisponível ' + resultado.rstrip(','))
+            raise Exception('Quantidade_ou_produto_indisponível ' + resultado.rstrip('##'))
 
         return 'Compra finalizada'

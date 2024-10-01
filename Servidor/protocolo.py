@@ -7,8 +7,11 @@ class Protocolo:
     
     @classmethod
     def mapear_função(cls, metodo: str) -> any:
-        return cls.métodos[metodo][0]
-        
+        try:
+            return cls.métodos[metodo][0]
+        except:
+            raise Exception('ERRO-305@#Método não encontrado.')
+    
     @classmethod
     def carregar_protocolo_padrão(cls, objeto) -> None:
         with open('Servidor/protocolo.csv', mode='r', encoding='utf-8') as arquivo:

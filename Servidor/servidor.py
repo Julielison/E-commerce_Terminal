@@ -43,11 +43,15 @@ class Servidor:
 
             conn.sendall(resultado.encode())
         conn.close()
-        
+
 
     def processar_requisição(self, método: str, corpo_entidade: str) -> str:
         try:
             processar_no_estoque = Protocolo.mapear_função(método)
+        except Exception as msg:
+            return str(msg)
+        
+        try:
             if corpo_entidade is not None:
                 resultado = processar_no_estoque(corpo_entidade)
             else:
