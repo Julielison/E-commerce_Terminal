@@ -22,7 +22,6 @@ class Protocolo:
             
             # Iterar pelas linhas do arquivo
             for linha in leitor_csv:
-                print(linha)
                 metodo, codigo_sucesso, codigo_erro = linha
                 método_estoque = getattr(objeto, metodo.lower())
                 cls.métodos[metodo] = (método_estoque, codigo_sucesso, codigo_erro)

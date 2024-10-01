@@ -26,11 +26,9 @@ class Estoque:
 
         # Recuperar os resultados
         categorias = cursor.fetchall()
-        print(categorias)
 
         i = 1
         for cat in categorias:
-            print(cat)
             categoria = Categoria(str(cat[0]))
             self.categorias.inserir(i, categoria)
             i += 1
@@ -50,7 +48,7 @@ class Estoque:
                 nome = prod[1]
                 preço = prod[2]
                 qtd = prod[3]
-                produto = Produto(nome, preço, qtd, categoria)
+                produto = Produto(nome, float(preço), int(qtd), categoria)
                 self.estoque.put(id, produto)
                 Estoque.qtd_produtos += 1
 
@@ -124,27 +122,54 @@ class Estoque:
 
     def comprar(self, dados: str) -> str:
         '''
-            id_produto:quant,id_produto,quant
+            id_produto##quant,id_produto##quant
         '''
         resultado = ''
         flag = False
+        print(dados)
 
-        prod_qtd = dados.split(',')
-        for e in prod_qtd:
-            id, qtd = e.split(':'),
+        prod_qtd = dados
+
+        if ';' in prod_qtd:
+            prod_qtd = prod_qtd.split(';')
+
+            for e in prod_qtd:
+                id, qtd = e.split(':')
+                id = int(id)
+                qtd = int(qtd)  # Converter qtd para inteiro
+                try:
+                    produto = self.estoque.get(id)
+                except:
+                    resultado += f'{id}#{0}##'
+                    continue
+
+                if qtd > produto.quantidade:
+                    resultado += f'{id}#{produto.quantidade}##'
+                    flag = True
+                else:
+                    produto.quantidade -= qtd  # Subtrai a quantidade comprada
+                    if produto.quantidade == 0:
+                        self.estoque.remove(id)
+
+        else:
+            id, qtd = prod_qtd.split(':')
+            id = int(id)
+            qtd = int(qtd)  # Converter qtd para inteiro
             try:
                 produto = self.estoque.get(id)
             except:
-                resultado += f'{id}:{0},'
-                continue
-
-            if qtd > produto.quantidade:
-                resultado += f'{id}:{produto.quantidade},'
                 flag = True
+                resultado += f'{id}#{0}##'
+                produto = None  # Garantir que produto não será acessado abaixo se a exceção ocorrer
 
-            produto.quantidade -= 1
-            if produto.quantidade == 0:
-                self.estoque.remove(id)
+            if produto is not None:  # Certificar que o produto foi encontrado
+                if qtd > produto.quantidade:
+                    resultado += f'{id}#{produto.quantidade}##'
+                    flag = True
+                else:
+                    produto.quantidade -= qtd  # Subtrai a quantidade comprada
+                    if produto.quantidade == 0:
+                        self.estoque.remove(id)
 
         if flag:
             raise Exception('Quantidade_ou_produto_indisponível ' + resultado.rstrip('##'))
