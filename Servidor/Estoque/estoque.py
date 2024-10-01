@@ -1,91 +1,105 @@
+from Servidor.Estoque.categoria import Categoria
+from Servidor.Estoque.sql import Sql
 from Servidor.Estruturas.LinearProbingLoadFactor import HashTable
+from Servidor.Estruturas.listaEncadeada import Lista
 from Servidor.Estoque.produto import Produto
 import csv
+import sqlite3
+
+
+
 
 class Estoque:
-    estoque = HashTable()
+    qtd_produtos = 0
+    def __init__(self):
+        self.estoque = HashTable()
+        self.categorias = Lista()
 
-    @classmethod
-    def carregar_estoque(cls) -> None:
-        cls.adicionar_categorias('Categorias.csv')
-        cls.adicionar_produtos()
+    def preencher(self) -> None:
+        # Conectar ao banco de dados SQLite
+        conn = sqlite3.connect('./data_base.db')
+        cursor = conn.cursor()
 
-    @classmethod
-    def adicionar_categorias(cls, arquivo: str) -> None:
-        try:
-            with open(f'./Csv{arquivo}', mode='r', newline='', encoding='utf-8') as arquivo_csv:
-                leitor = csv.reader(arquivo_csv)
-                next(leitor)
-                
-                # Ler cada linha do arquivo
-                for categoria in leitor:
-                    cls.estoque[categoria] = HashTable()
+        comando = Sql.categorias()
 
-        except FileNotFoundError:
-            print(f"O arquivo '{arquivo}' não foi encontrado.")
-        except Exception as e:
-            print(f"Ocorreu um erro: {e}")
+        # Executar um SELECT para pegar todos os nomes das categorias
+        cursor.execute(comando)
+
+        # Recuperar os resultados
+        categorias = cursor.fetchall()
+
+        for cat in categorias:
+            categoria = Categoria(cat[0])
+            self.categorias.inserir(categoria)  # Adicionar a categoria à lista
+
+            comando = Sql.produtos_por_categoria()
+
+            # Executar um SELECT para pegar produtos dessa categoria
+            cursor.execute(comando, (categoria.nome,))
+
+            # Recuperar os produtos da categoria
+            produtos = cursor.fetchall()
+
+            # Preencher o estoque com os produtos
+            for prod in produtos:
+                id = prod[0]
+                nome = prod[1]
+                preço = prod[2]
+                qtd = prod[3]
+                produto = Produto(nome, preço, qtd, categoria)
+                self.estoque.put(id, produto)
+                Estoque.qtd_produtos += 1
+
+        # Fechar a conexão
+        conn.close()
 
 
-    @classmethod
-    def adicionar_produtos(cls) -> None:
-        for categoria in cls.estoque.keys():
+    def pegar_categorias(self) -> str:
+        string = ''
+        for cat in self.categorias:
+            string += cat.nome
+        return string
+            
+
+    def pegar_produtos(self, inicio = 1) -> str:
+        qtd = Estoque.qtd_produtos
+
+        if inicio > qtd:
+            raise Exception('Sem mais produtos')
+        string = ''
+
+        for i in range(inicio, qtd+1):
             try:
-                with open(f'./Csv{categoria}.csv', mode='r', newline='', encoding='utf-8') as arquivo_csv:
-                    leitor = csv.reader(arquivo_csv)
-                    next(leitor)
-                    
-                    id = 1
-                    for linha in leitor:
-                        nome, preço, quantidade = linha[0], linha[1], linha[2]
-                        cls.estoque[categoria][id] = HashTable(Produto(nome, preço, quantidade))
-                        id += 1
+                self.estoque.get()
 
-            except FileNotFoundError:
-                print(f"O arquivo da categoria {categoria} não foi encontrado.")
-            except Exception as e:
-                print(f"Ocorreu um erro: {e}")
-
-    @classmethod
-    def pegar_categorias(cls) -> list:
-        return cls.estoque.keys()
-    
-    @classmethod
-    def adicionar_produto(cls, produto: Produto) -> None:
-        cls.__produtos[cls.__contador+1] = produto
-
-    @classmethod
-    def obter_produto(cls, id: int) -> any:
-        try:
-            return cls[id]
-        except KeyError:
-            print(f'O produto com id {id} não está mais disponível.')
-
-
-    '''
-    Cenários:
-        quantidade fornecida maior que o disponível
-        produto indisponível
-    '''
-    @classmethod
-    def comprar_produtos(cls, ids_qtds: json) -> str:
-        ids_e_qtds = json.loads(ids_qtds)
-        comprados = Lista()
-        esgotados = Lista()
-        limitados = {} # Implementar com hashtable fornecida
-
-        for id, qtd in ids_e_qtds.items():
-            produto = cls.obter_produto(id)
-
-            if produto.quantidade == 0:
-                esgotados.append(id)
-
-            elif produto.quantidade < qtd:
-                limitados[id] = produto.quantidade
-
-            else:
-                produto.quantidade -= 1
-                comprados.append(id)
+    def comprar_produtos(self, dados: str) -> str:
+        '''
+        Formato dos dados: categoria;id.quantidade;id.quantidade,categoria;id.quantidade ...
+        '''
+        resultado = ''
+        esgotados = []
+        limitados = {}
+        comprados = {}
         
+        # Processar os dados (exemplo de como eles podem ser divididos)
+        categorias_dados = dados.split(',')
+        for categoria_dados in categorias_dados:
+            categoria, *ids_e_qtds = categoria_dados.split(';')
+            for id_qtd in ids_e_qtds:
+                id, qtd = map(int, id_qtd.split('.'))
+                produto = self.obter_produto(categoria, id)  # Obter produto pelo id e categoria
+
+                if produto.quantidade == 0:
+                    esgotados.append(id)
+                elif produto.quantidade < qtd:
+                    limitados[id] = produto.quantidade
+                else:
+                    produto.quantidade -= qtd  # Reduzir a quantidade
+                    comprados[id] = qtd  # Registrar o produto comprado
+
         resposta = {'comprados': comprados, 'limitados': limitados, 'esgotados': esgotados}
         return json.dumps(resposta)
+
+    def obter_produto(self, categoria: str, id: int) -> Produto:
+        """ Método para obter um produto específico dado a categoria e o ID. """
+        return self.estoque[categoria][id]

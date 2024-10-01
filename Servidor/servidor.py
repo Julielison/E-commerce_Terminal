@@ -1,8 +1,8 @@
 import threading
 import socket
 import time
-# from protocolo import Protocolo
-# from Estoque.estoque import Estoque
+from protocolo import Protocolo
+from Estoque.estoque import Estoque
 
 
 class Servidor:
@@ -39,8 +39,7 @@ class Servidor:
 
             # Aqui usamos o semáforo para controlar o acesso ao estoque
             with self.semaforo:
-                resultado = self.teste(método)
-                # resultado = self.processar_requisição(método, corpo_entidade)
+                resultado = self.processar_requisição(método, corpo_entidade)
             print('FInalizou')
 
             conn.sendall(resultado.encode())
@@ -51,22 +50,21 @@ class Servidor:
         time.sleep(10)
         return 'retornou'
 
-    # def processar_requisição(self, método: str, corpo_entidade: str) -> str:
-    #     try:
-    #         # processar_no_estoque = Protocolo.mapear_função(método)
-    #         if corpo_entidade is not None:
-    #             resultado = processar_no_estoque(corpo_entidade)
-    #         else:
-    #             resultado = processar_no_estoque()
-    #     except Exception as e:
-    #         print(e)
-    #         resultado = "Erro no processamento da requisição"
-    #     return resultado
+    def processar_requisição(self, método: str, corpo_entidade: str) -> str:
+        try:
+            processar_no_estoque = Protocolo.mapear_função(método)
+            if corpo_entidade is not None:
+                resultado = processar_no_estoque(corpo_entidade)
+            else:
+                resultado = processar_no_estoque()
+        except Exception as e:
+            resultado = e
+        return resultado
 
 
 if __name__ == '__main__':
     servidor = Servidor()
     servidor.start()
-    # estoque = Estoque()
-    # estoque.preencher()
-    # Protocolo.criar(estoque)
+    estoque = Estoque()
+    estoque.preencher()
+    Protocolo.criar(estoque)
