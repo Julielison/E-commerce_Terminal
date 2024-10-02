@@ -3,16 +3,45 @@ import threading
 from tabulate import tabulate
 
 class Cliente:
+    """
+    Classe Cliente que simula a interação de um usuário com um sistema de e-commerce através de um cliente TCP.
+    O cliente se conecta a um servidor, permite visualizar produtos e categorias, adicionar itens ao carrinho e finalizar compras.
+
+    Atributos:
+        host (str): Endereço do servidor, por padrão 'localhost'.
+        port (int): Porta de comunicação com o servidor.
+        socket (socket.socket): Socket utilizado para comunicação.
+        nome_cliente (str): Nome do cliente.
+        carrinho (dict): Carrinho de compras, armazena os produtos e suas quantidades.
+        produtos (dict): Dicionário que armazena os detalhes dos produtos recebidos do servidor.
+        running (bool): Sinalizador para controlar a execução da thread de recebimento de mensagens.
+    
+    Métodos:
+        start(): Inicia a conexão com o servidor e exibe o menu de opções ao cliente.
+        show_menu(): Exibe o menu de opções disponíveis para o cliente.
+        receive_message(): Thread responsável por receber e processar mensagens do servidor.
+        adicionar_ao_carrinho(): Adiciona produtos ao carrinho com base no ID e na quantidade informada.
+        finalizar_compra(): Finaliza a compra, exibe os itens do carrinho e envia a solicitação de compra ao servidor.
+    """
+
     def __init__(self):
+        """
+        Inicializa o cliente com os parâmetros de host, porta e configura os atributos para o carrinho de compras
+        e produtos disponíveis.
+        """
         self.host = 'localhost'
         self.port = 55550
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.nome_cliente = None
         self.carrinho = {}
         self.produtos = {}  # Para armazenar os detalhes dos produtos recebidos
-        self.running = True  # Sinalizador para a thread
+        self.running = True  # Sinalizador para a thread de recebimento de mensagens
 
-    def start(self):
+    def start(self) -> None:
+        """
+        Inicia a conexão com o servidor e mantém o loop principal do cliente.
+        O cliente pode enviar comandos ao servidor e processar as respostas.
+        """
         self.socket.connect((self.host, self.port))
         print('Conectado ao servidor')
 
@@ -20,16 +49,18 @@ class Cliente:
         self.nome_cliente = input("Bem-vindo ao E-commerce! Por favor, insira seu nome: ")
         print(f"Olá, {self.nome_cliente}! Abaixo estão as opções disponíveis:")
 
+        # Iniciar a thread de recebimento de mensagens do servidor
         threading.Thread(target=self.receive_message).start()
 
+        # Loop principal do cliente
         while True:
             self.show_menu()
             opcao = input("\nEscolha uma opção: ")
 
             if opcao == '5':  # SAIR
-                self.running = False  # Define o sinalizador como False
+                self.running = False  # Para a thread de recebimento de mensagens
                 self.socket.sendall('SAIR'.encode())
-                print("Obrigado por usar nosso serviço! Tenha um bom dia!")  # Mensagem de agradecimento
+                print("Obrigado por usar nosso serviço! Tenha um bom dia!")
                 self.socket.close()
                 break
             elif opcao == '1':  # VER PRODUTOS
@@ -43,7 +74,10 @@ class Cliente:
             else:
                 print("Opção inválida. Tente novamente.")
 
-    def show_menu(self):
+    def show_menu(self) -> None:
+        """
+        Exibe o menu de opções que o cliente pode escolher.
+        """
         menu = """
         [1] VER PRODUTOS
         [2] VER CATEGORIAS
@@ -53,27 +87,30 @@ class Cliente:
         """
         print(menu)
 
-    def receive_message(self):
-        while self.running:  # Continuar enquanto o sinalizador for True
+    def receive_message(self) -> None:
+        """
+        Thread responsável por receber e processar as mensagens do servidor.
+        As mensagens podem conter a lista de produtos ou categorias e são exibidas ao cliente.
+        """
+        while self.running:
             try:
                 data = self.socket.recv(1024)
                 if not data:  # Verifica se a conexão foi fechada
                     break
                 resposta = data.decode().split('@#')
 
-                # Exibir produtos de forma organizada com Tabulate
                 if resposta[0] == 'PROD-220':
+                    # Exibir produtos com tabulate
                     produtos = [p.split('#') for p in resposta[1:][0].split('##')]
                     headers = ['ID', 'Nome', 'Preço', 'Quantidade']
                     self.produtos = {prod[0]: {'nome': prod[1], 'preco': float(prod[2]), 'estoque': int(prod[3])} for prod in produtos}
                     print(tabulate(produtos, headers, tablefmt="grid"))
 
-                elif resposta[0] == 'CATE-221':  # Ajuste aqui para o novo código
-                    categorias = resposta[1].split('#')  # Usar '#' como separador
+                elif resposta[0] == 'CATE-221':
+                    # Exibir categorias com tabulate
+                    categorias = resposta[1].split('#')
                     print("\nCategorias disponíveis:")
-                    
-                    # Cria uma tabela para as categorias
-                    categoria_table = [[categoria] for categoria in categorias if categoria.strip()]  # Exclui categorias vazias
+                    categoria_table = [[categoria] for categoria in categorias if categoria.strip()]
                     print(tabulate(categoria_table, headers=['Categorias'], tablefmt="grid"))
 
                 else:
@@ -82,7 +119,11 @@ class Cliente:
                 print("Erro ao receber mensagem do servidor:", str(e))
                 break
 
-    def adicionar_ao_carrinho(self):
+    def adicionar_ao_carrinho(self) -> None:
+        """
+        Adiciona um produto ao carrinho de compras com base no ID e na quantidade informados pelo cliente.
+        Verifica se o ID é válido e se a quantidade solicitada está disponível em estoque.
+        """
         try:
             produto_id = input("Insira o ID do produto que deseja adicionar ao carrinho: ")
             quantidade = int(input("Quantidade: "))
@@ -104,12 +145,16 @@ class Cliente:
         except Exception as e:
             print("Erro ao adicionar produto ao carrinho:", str(e))
 
-    def finalizar_compra(self):
+    def finalizar_compra(self) -> None:
+        """
+        Exibe os itens do carrinho de compras e o total da compra.
+        Permite ao cliente confirmar a finalização da compra e envia o pedido ao servidor.
+        """
         if not self.carrinho:
             print("Seu carrinho está vazio!")
             return
 
-        # Exibir os itens do carrinho antes da finalização, incluindo preços
+        # Exibir os itens do carrinho
         print("\nSeu carrinho:")
         headers = ['ID do Produto', 'Nome', 'Quantidade', 'Preço Unitário (R$)', 'Subtotal (R$)']
         total = 0
@@ -126,18 +171,15 @@ class Cliente:
 
         confirmar = input("\nDeseja finalizar a compra? (s/n): ")
         if confirmar.lower() == 's':
-            # Montar a string de compra no formato ID:quantidade;ID:quantidade
+            # Enviar os detalhes da compra ao servidor
             compra = ';'.join([f"{prod_id}:{qtd}" for prod_id, qtd in self.carrinho.items()])
             self.socket.sendall(f'COMPRAR {compra}'.encode())
 
-            # Atualizar o estoque localmente após a compra
+            # Atualizar o estoque localmente
             for prod_id, qtd in self.carrinho.items():
                 self.produtos[prod_id]['estoque'] -= qtd
 
-            # Limpar o carrinho após a compra
             self.carrinho.clear()
-
-            # Exibir uma mensagem amigável
             print("Compra finalizada com sucesso! Obrigado por comprar conosco.")
         else:
             print("Compra cancelada.")
