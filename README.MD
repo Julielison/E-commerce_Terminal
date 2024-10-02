@@ -1,4 +1,4 @@
-# Título do Projeto
+# Sistema de E-commerce
 
 <!-- Substitua pelo título do seu projeto, por exemplo: "Sistema de E-commerce com Cliente-Servidor" -->
 
@@ -71,5 +71,49 @@ Siga os passos abaixo para executar a aplicação cliente-servidor:
 
 ### 1. Executar o Servidor
 No terminal, acesse o diretório do projeto e execute o seguinte comando para iniciar o servidor:
-```bash
-python servidor.py
+
+`python .\Servidor\servidor.py`
+
+Após isso, o servidor será aberto
+
+### 2. Executar o Cliente
+
+`python .\Cliente\cliente.py`
+
+Após isso, o cliente será  aberto e será conectado ao servidor
+
+### 3. Execução do codigo
+
+Irá aparecer uma mensagem de boas vindas e perguntará o nome do usuario
+
+`Bem-vindo ao E-commerce! Por favor, insira seu nome:`
+
+Após digitar o nome do usuario, aparecerá um menu onde digitando de 1-5 poderá ter acesso as funcionalidades do programa, assim como no menu abaixo
+
+`Olá, fulano! Abaixo estão as opções disponíveis:`
+
+        [1] VER PRODUTOS
+        [2] VER CATEGORIAS
+        [3] ADICIONAR PRODUTO AO CARRINHO
+        [4] FINALIZAR COMPRA
+        [5] SAIR
+        
+
+`Escolha uma opção:`
+
+Dessa forma, ao digitar:
+
+1: O usuário poderá visualizar os produtos disponíveis para compra.
+
+2: O usuário verá exemplos de categorias de produtos.
+
+3: O usuário poderá adicionar produtos ao carrinho de compras pelo seu ID e também poderá especificar a quantidade desejada.
+
+4: O usuário será levado ao carrinho de compras, onde poderá revisar os produtos selecionados e finalizar a compra.
+
+5: A aplicação será fechada.
+
+
+
+
+
