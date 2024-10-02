@@ -25,15 +25,16 @@ O sistema proposto é uma plataforma de e-commerce que permite que clientes visu
 
 | Arquivo                | Descrição                                                                 |
 |------------------------|---------------------------------------------------------------------------|
-| `servidor.py`           | Arquivo responsável pelo gerenciamento do servidor TCP.                   |
+| `servidor.py`          | Classe que implementa um servidor TCP multi-thread para processar requisições de clientes e interagir com o estoque de produtos. |
 | `cliente.py`            | Arquivo responsável pela interface do cliente e comunicação com o servidor.|
 | `protocolo.py`          | Contém a definição das funções e métodos do protocolo de comunicação.     |
 | `estoque.py`    | Módulo que gerencia o estoque de produtos disponíveis no servidor.        |
-| `protocolo.csv`| Arquivo CSV que mapeia os métodos e os códigos de sucesso e erro.         |
+| `protocolo.csv`| Arquivo CSV que contém os métodos e os códigos de sucesso e erro.         |
 | `categoria.py` | Classe que representa uma categoria com um nome, gerenciando o armazenamento e o acesso ao nome da categoria. |
 | `produto.py` | Classe usada para criar um objeto produto com atributos como nome, preço, quantidade e categoria. Contém métodos para gerenciar e validar os atributos do produto, incluindo nome, preço, quantidade e categoria. |
 | `sql.py`                | Classe Sql que contém métodos para retornar consultas SQL utilizadas no sistema de estoque. Os métodos desta classe retornam comandos SQL para buscar produtos e categorias no banco de dados. |
-| `LinearProbingLoadFactor.py` | HashTable usada para guardar os produtos e também os métodos, códigos de erro, sucesso, e funções associadas ao protocolo.
+| `LinearProbingLoadFactor.py` | Contém a HashTable usada para guardar os produtos e também os métodos, códigos de erro, sucesso, e funções associadas ao protocolo.
+| `listaEncadeada.py` | Contém a lista simplesmente simplesmente encadeada, usada para armazenar os objetos de cada categoria. |
 
 ## Pré-requisitos para Execução
 
