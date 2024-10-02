@@ -9,7 +9,7 @@ import sqlite3
 
 class Estoque:
     qtd_produtos = 0
-    qtd_categprias = 0
+    qtd_categorias = 0
 
     def __init__(self):
         self.estoque = HashTable()
@@ -32,7 +32,7 @@ class Estoque:
             categoria = Categoria(str(cat[0]))
             self.categorias.inserir(i, categoria)
             i += 1
-            Estoque.qtd_categprias += 1
+            Estoque.qtd_categorias += 1
 
             comando = Sql.produtos_por_categoria()
 
@@ -58,7 +58,7 @@ class Estoque:
 
     def pegar_categorias(self) -> str:
         resultado = ''
-        for i in range(1, Estoque.qtd_categprias+1):
+        for i in range(1, Estoque.qtd_categorias+1):
             resultado += f'{self.categorias.elemento(i).nome}#'
 
         return resultado.rstrip('#')
@@ -67,7 +67,7 @@ class Estoque:
     def pegar_produtos(self, id_inicio = 0) -> str:
         id_inicio = int(id_inicio)
         qtd = Estoque.qtd_produtos
-        total = 10
+        total = 5
 
         if id_inicio+total > qtd:
             raise Exception('Sem_produtos_para_exibir.')
@@ -88,9 +88,13 @@ class Estoque:
     
     def pegar_produtos_da_categoria(self, categoria: str) -> str:
         resultado = ''
+        cont = 0
         for id, produto in self.estoque.items():
             if produto.categoria == categoria:
                 resultado += self.__montar_string_produto(id, produto)
+                cont +=1
+                if cont == 10:
+                    break
 
         if resultado == '':
             raise Exception("Sem_produtos_para_essa_categoria")
@@ -103,6 +107,7 @@ class Estoque:
         resultado = ''
     
         # Verificar se há uma correspondência
+        cont = 0
         for id in self.estoque.keys():
             try:
                 produto = self.estoque.get(id)
@@ -110,6 +115,9 @@ class Estoque:
                 continue
             if padrao.search(produto.nome):
                 resultado += self.__montar_string_produto(id, produto)
+                cont += 1
+            if cont == 10:
+                break
         
         if resultado == '':
             raise Exception('Nenhum produto encontrado.')

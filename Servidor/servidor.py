@@ -35,6 +35,7 @@ class Servidor:
                 corpo_entidade = dados_separados[1]
 
             if método == 'SAIR':
+                resultado = 'sair'
                 break
 
             # Aqui usamos o semáforo para controlar o acesso ao estoque

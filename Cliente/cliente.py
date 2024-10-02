@@ -1,8 +1,7 @@
 import socket
-import sys
-import os
-import time
 import threading
+from tabulate import tabulate
+import os
 
 class Cliente:
     def __init__(self):
@@ -27,10 +26,32 @@ class Cliente:
     def receive_message(self): # Recebe mensagens do servidor
         while True:
             data = self.socket.recv(1024)
-            print('Recebido:', data.decode().split('@#'))
-            if data.decode() == 'exit':
+            data = data.decode()
+            if data == 'exit':
                 self.socket.close()
                 break
+            self.opcoes(data)
+
+    def opcoes(self, data: str) -> None:
+        codigo, dados = data.split('@#')
+        if codigo in ['PROD-220','PRCA-222','PQAS-224']:
+            tabela = [['id','nome', 'preco','quantidade']]
+
+            for p in dados.split('##'):
+                tabela.append(p.split('#'))
+            # Exibindo a tabela formatada
+            print(tabulate(tabela, headers="firstrow", tablefmt="grid"))
+
+        elif codigo == 'CATE-221':
+            tabela = [['Categorias']]
+            for e in dados.split('#'):
+                tabela.append([e])
+
+            print(tabulate(tabela, headers="firstrow", tablefmt="grid"))
+
+        elif codigo == 'COMP-223':
+            print('Compra finalizada.')
+
 
 if __name__ == '__main__':
     cliente = Cliente()
