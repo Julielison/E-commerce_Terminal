@@ -1,4 +1,4 @@
-# Título do Projeto
+# Sistema de E-commerce
 
 <!-- Substitua pelo título do seu projeto, por exemplo: "Sistema de E-commerce com Cliente-Servidor" -->
 
@@ -71,10 +71,14 @@ Siga os passos abaixo para executar a aplicação cliente-servidor:
 
 ### 1. Executar o Servidor
 No terminal, acesse o diretório do projeto e execute o seguinte comando para iniciar o servidor:
-```bash
+/```bash
 python servidor.py
 
 Após isso, o servidor será aberto
-Desse modo, seguindo adiante acesso o diretorio do proejto e execute o seguinte comando para iniciar o cliente:
-```bash
+
+### 2. Executar o Cliente
+/```bash
 python cliente.py
+
+Após isso, o cliente será  aberto e será conectado ao servidor
+
