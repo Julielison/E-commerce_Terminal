@@ -73,3 +73,8 @@ Siga os passos abaixo para executar a aplicação cliente-servidor:
 No terminal, acesse o diretório do projeto e execute o seguinte comando para iniciar o servidor:
 ```bash
 python servidor.py
+
+Após isso, o servidor será aberto
+Desse modo, seguindo adiante acesso o diretorio do proejto e execute o seguinte comando para iniciar o cliente:
+```bash
+python cliente.py
