@@ -72,13 +72,13 @@ Siga os passos abaixo para executar a aplicação cliente-servidor:
 ### 1. Executar o Servidor
 No terminal, acesse o diretório do projeto e execute o seguinte comando para iniciar o servidor:
 
-´python servidor.py´ 
+`python servidor.py`
 
 Após isso, o servidor será aberto
 
 ### 2. Executar o Cliente
 
-´python cliente.py´
+`python cliente.py`
 
 Após isso, o cliente será  aberto e será conectado ao servidor
 
@@ -86,11 +86,11 @@ Após isso, o cliente será  aberto e será conectado ao servidor
 
 Irá aparecer uma mensagem de boas vindas e perguntará o nome do usuario
 
-´Bem-vindo ao E-commerce! Por favor, insira seu nome:`
+`Bem-vindo ao E-commerce! Por favor, insira seu nome:`
 
 Após digitar o nome do usuario, aparecerá um menu onde digitando de 1-5 poderá ter acesso as funcionalidades do programa, assim como no menu abaixo
 
-´Olá, fulano! Abaixo estão as opções disponíveis:
+`Olá, fulano! Abaixo estão as opções disponíveis:
 
         [1] VER PRODUTOS
         [2] VER CATEGORIAS
