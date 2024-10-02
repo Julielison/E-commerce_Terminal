@@ -90,7 +90,7 @@ Irá aparecer uma mensagem de boas vindas e perguntará o nome do usuario
 
 Após digitar o nome do usuario, aparecerá um menu onde digitando de 1-5 poderá ter acesso as funcionalidades do programa, assim como no menu abaixo
 
-`Olá, fulano! Abaixo estão as opções disponíveis:
+`Olá, fulano! Abaixo estão as opções disponíveis:`
 
         [1] VER PRODUTOS
         [2] VER CATEGORIAS
@@ -99,14 +99,18 @@ Após digitar o nome do usuario, aparecerá um menu onde digitando de 1-5 poder�
         [5] SAIR
         
 
-Escolha uma opção:`
+`Escolha uma opção:`
 
 Dessa forma, ao digitar:
 
 1: O usuário poderá visualizar os produtos disponíveis para compra.
+
 2: O usuário verá exemplos de categorias de produtos.
+
 3: O usuário poderá adicionar produtos ao carrinho de compras pelo seu ID e também poderá especificar a quantidade desejada.
+
 4: O usuário será levado ao carrinho de compras, onde poderá revisar os produtos selecionados e finalizar a compra.
+
 5: A aplicação será fechada.
 
 
