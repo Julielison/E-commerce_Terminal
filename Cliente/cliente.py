@@ -188,7 +188,7 @@ class Cliente:
                     self.produtos[prod_id]['estoque'] -= qtd
 
                 self.carrinho.clear()
-                print("Compra finalizada com sucesso! Obrigado por comprar conosco.")
+                print("Compra finalizada com sucesso!")
             except Exception as e:
                 print("Erro ao finalizar a compra:", str(e))
         else:
