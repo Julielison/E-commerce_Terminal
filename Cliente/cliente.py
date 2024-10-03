@@ -1,6 +1,7 @@
 import socket
 import threading
 from tabulate import tabulate
+from Estruturas.LinearProbingLoadFactor import HashTable  # Estrutura de dados disponibilizada pelo professor
 
 class Cliente:
     """
@@ -12,8 +13,8 @@ class Cliente:
         port (int): Porta de comunicação com o servidor.
         socket (socket.socket): Socket utilizado para comunicação.
         nome_cliente (str): Nome do cliente.
-        carrinho (dict): Carrinho de compras, armazena os produtos e suas quantidades.
-        produtos (dict): Dicionário que armazena os detalhes dos produtos recebidos do servidor.
+        carrinho (HashTable): Carrinho de compras, armazena os produtos e suas quantidades.
+        produtos (HashTable): Tabela hash que armazena os detalhes dos produtos recebidos do servidor.
         running (bool): Sinalizador para controlar a execução da thread de recebimento de mensagens.
     
     Métodos:
@@ -33,8 +34,8 @@ class Cliente:
         self.port = 55550
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.nome_cliente = None
-        self.carrinho = {}
-        self.produtos = {}  # Para armazenar os detalhes dos produtos recebidos
+        self.carrinho = HashTable()  # Usando HashTable para o carrinho
+        self.produtos = HashTable()  # Usando HashTable para os produtos
         self.running = True  # Sinalizador para a thread de recebimento de mensagens
 
     def start(self) -> None:
@@ -104,7 +105,9 @@ class Cliente:
                     # Exibir produtos com tabulate
                     produtos = [p.split('#') for p in resposta[1].split('##')]
                     headers = ['ID', 'Nome', 'Preço', 'Quantidade']
-                    self.produtos = {prod[0]: {'nome': prod[1], 'preco': float(prod[2]), 'estoque': int(prod[3])} for prod in produtos}
+                    self.produtos = HashTable()  # Limpar produtos ao receber nova lista
+                    for prod in produtos:
+                        self.produtos[prod[0]] = {'nome': prod[1], 'preco': float(prod[2]), 'estoque': int(prod[3])}
                     print(tabulate(produtos, headers, tablefmt="grid"))
 
                 elif resposta[0] == 'CATE-221':
@@ -137,7 +140,8 @@ class Cliente:
                 print("ID do produto inválido!")
                 return
 
-            if quantidade > self.produtos[produto_id]['estoque']:
+            produto = self.produtos[produto_id]
+            if quantidade > produto['estoque']:
                 print("Quantidade indisponível em estoque.")
                 return
 
@@ -166,9 +170,11 @@ class Cliente:
         headers = ['ID do Produto', 'Nome', 'Quantidade', 'Preço Unitário (R$)', 'Subtotal (R$)']
         total = 0
         carrinho_table = []
-        for prod_id, qtd in self.carrinho.items():
-            nome = self.produtos[prod_id]['nome']
-            preco_unitario = self.produtos[prod_id]['preco']
+        for prod_id in self.carrinho.keys():
+            qtd = self.carrinho[prod_id]
+            produto = self.produtos[prod_id]
+            nome = produto['nome']
+            preco_unitario = produto['preco']
             subtotal = preco_unitario * qtd
             total += subtotal
             carrinho_table.append([prod_id, nome, qtd, f"{preco_unitario:.2f}", f"{subtotal:.2f}"])
@@ -184,10 +190,10 @@ class Cliente:
                 self.socket.sendall(f'COMPRAR {compra}'.encode())
 
                 # Atualizar o estoque localmente
-                for prod_id, qtd in self.carrinho.items():
-                    self.produtos[prod_id]['estoque'] -= qtd
+                for prod_id in self.carrinho.keys():
+                    self.produtos[prod_id]['estoque'] -= self.carrinho[prod_id]
 
-                self.carrinho.clear()
+                self.carrinho = HashTable()  # Limpar o carrinho após a compra
                 print("Compra finalizada com sucesso!")
             except Exception as e:
                 print("Erro ao finalizar a compra:", str(e))
