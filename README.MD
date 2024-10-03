@@ -37,14 +37,15 @@ O sistema proposto é uma plataforma de e-commerce que permite que clientes visu
 | `listaEncadeada.py` | Contém a lista simplesmente simplesmente encadeada, usada para armazenar os objetos de cada categoria. |
 
 ## Pré-requisitos para Execução
-
-Antes de executar a aplicação, certifique-se de ter os seguintes pacotes instalados:
+- Python versão 3.12.1 ou superior
+- Antes de executar a aplicação, certifique-se de ter os seguintes pacotes instalados:
 
 | Pacote/Biblioteca | Propósito                                                                 | Instalação                                                      |
 |-------------------|---------------------------------------------------------------------------|-----------------------------------------------------------------|
 | `socket`          | Comunicação cliente-servidor via TCP.                                     | Instalado por padrão no Python.                                 |
 | `threading`       | Para executar múltiplas threads simultaneamente.                          | Instalado por padrão no Python.                                 |
 | `tabulate`        | Utilizado para formatar tabelas de dados no cliente.                      | `pip install tabulate`                                          |
+| `numpy`           | Utilizado para criar um array eficiente que guarda os valores da hashtable | `pip install numpy` |
 
 ## Protocolo da Aplicação
 
