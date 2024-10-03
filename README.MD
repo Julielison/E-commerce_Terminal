@@ -55,23 +55,23 @@ Aqui está a documentação das mensagens trocadas entre o cliente e o servidor:
 |------------------|--------------------------------|------------------------------------------------------------------|
 | `PEGAR_PRODUTOS` | Nenhum                         | Retorna uma lista de todos os produtos disponíveis.               |
 | `PEGAR_CATEGORIAS`| Nenhum                        | Retorna uma lista de todas as categorias disponíveis.             |
-| `COMPRAR`        | `ID:quantidade;ID:quantidade`  | Envia uma solicitação para finalizar a compra dos produtos no carrinho. |
+| `COMPRAR`        | `id_produto:quantidade;id_produto:quantidade`  | Envia uma solicitação para finalizar a compra dos produtos no carrinho, podendo ser mais de um produto|
 | `SAIR`           | Nenhum                         | Finaliza a sessão do cliente e desconecta do servidor.            |
 
 ### Respostas do Servidor
-| Código de Resposta | Descrição                                                         |
-|--------------------|-------------------------------------------------------------------|
-| `PROD-220`         | Lista de produtos, incluindo ID, Nome, Preço e Quantidade.        |
-| `CATE-221`         | Lista de categorias.                                              |
-| `PRCA-222`         | A lista de produtos da categoria foi recuperada com sucesso.|
-| `COMP-223`         | A compra foi realizada com sucesso, e o pedido foi confirmado.|
-| `PQAS-224`         | A pesquisa foi realizada com sucesso, e o produto correspondente foi retornado.|
-| `ERRO-305`         | Mensagem de erro genérico para métodos não encontrados ou inválidos.|
-| `ERRO-304`         | Mensagem de erro devido à inexistência do produto.|
-| `ERRO-303`         | Mensagem de erro devido um problema ao finalizar a compra.|
-| `ERRO-302`         | Mensagem de erro ao buscar os produtos da categoria.|
-| `ERRO-301`         | Mensagem de erro ao buscar uma categoria.|
-| `ERRO-300`         | Mensagem de erro ao tentar recuperar os produtos.|
+| Código de Resposta | Descrição                                                         | Formatação                           |
+|--------------------|-------------------------------------------------------------------|--------------------------------------|
+| `PROD-220`         | Indica que a consulta de produtos foi realizada com sucesso e que os dados deles foram retornados.        | PROD-220@#id_produto#nome#preço#quant##id_produto#nome#preço#quant... |
+| `CATE-221`         | Indica que a consulta de categorias foi realizada com sucesso, ou seja, os nomes das categorias foram retornados                                        | CATE-221@#c1#c2#c3#c4... |
+| `PRCA-222`         | Indica que foram retornados produtos para a categoria especificada .| PQAS-224@#id_produto#nome#preço#quant##id_produto#nome#preço#quant... |
+| `COMP-223`         | A compra foi realizada com sucesso, e o pedido foi confirmado.| COMP-223@#Compra_finalizada. |
+| `PQAS-224`         | A pesquisa foi realizada com sucesso, e os produtos que contém o nome foram retornados.| PQAS-224@#id_produto#nome#preço#quant##id_produto#nome#preço#quant...|
+| `ERRO-305`         | Mensagem de erro genérico para métodos não encontrados ou inválidos.| ERRO-305@#Método não encontrado.|
+| `ERRO-304`         | Mensagem de erro devido à inexistência do produto.| ERRO-304@#Nenhum_produto_encontrado. |
+| `ERRO-303`         | Mensagem de erro contendo a quantidade do produto existente.| ERRO-303@#Quantidade_ou_produto_indisponível id_produto#nome#preço#quant##id_produto#nome#preço#quant...
+| `ERRO-302`         | Devolve esse erro quando não existem produtos para categoria especificada.| ERRO-302@#Sem_produtos_para_essa_categoria. |
+| `ERRO-301`         | Sem categorias no estoque | ERRO-301@#Sem_categorias.
+| `ERRO-300`         | Indica que não há mais produtos no estoque ou não há mais produtos para serem exibidos (em caso de paginação)| ERRO-300@#Sem_produtos_para_exibir.
 
 ## Instruções para Execução
 

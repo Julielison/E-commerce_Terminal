@@ -169,7 +169,7 @@ class Estoque:
                 resultado += self.__montar_string_produto(id, produto)
         
         if resultado == '':
-            raise Exception('Nenhum produto encontrado.')
+            raise Exception('Nenhum_produto_encontrado.')
 
         return resultado.rstrip('##')
 
