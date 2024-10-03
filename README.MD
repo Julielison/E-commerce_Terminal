@@ -63,7 +63,15 @@ Aqui está a documentação das mensagens trocadas entre o cliente e o servidor:
 |--------------------|-------------------------------------------------------------------|
 | `PROD-220`         | Lista de produtos, incluindo ID, Nome, Preço e Quantidade.        |
 | `CATE-221`         | Lista de categorias.                                              |
+| `PRCA-222`         | A lista de produtos da categoria foi recuperada com sucesso.|
+| `COMP-223`         | A compra foi realizada com sucesso, e o pedido foi confirmado.|
+| `PQAS-224`         | A pesquisa foi realizada com sucesso, e o produto correspondente foi retornado.|
 | `ERRO-305`         | Mensagem de erro genérico para métodos não encontrados ou inválidos.|
+| `ERRO-304`         | Mensagem de erro devido à inexistência do produto.|
+| `ERRO-303`         | Mensagem de erro devido um problema ao finalizar a compra.|
+| `ERRO-302`         | Mensagem de erro ao buscar os produtos da categoria.|
+| `ERRO-301`         | Mensagem de erro ao buscar uma categoria.|
+| `ERRO-300`         | Mensagem de erro ao tentar recuperar os produtos.|
 
 ## Instruções para Execução
 
