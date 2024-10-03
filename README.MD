@@ -68,8 +68,8 @@ Aqui está a documentação das mensagens trocadas entre o cliente e o servidor:
 | `PQAS-224`         | A pesquisa foi realizada com sucesso, e o produto correspondente foi retornado.|
 | `ERRO-305`         | Mensagem de erro genérico para métodos não encontrados ou inválidos.|
 | `ERRO-304`         | Mensagem de erro devido à inexistência do produto.|
-| `ERRO-303`         | Mensagem de erro devido um problema ao finalizar a compra|
-| `ERRO-302`         | Mensagem de erro ao buscar os produtos da categoria|
+| `ERRO-303`         | Mensagem de erro devido um problema ao finalizar a compra.|
+| `ERRO-302`         | Mensagem de erro ao buscar os produtos da categoria.|
 | `ERRO-301`         | Mensagem de erro ao buscar uma categoria.|
 | `ERRO-300`         | Mensagem de erro ao tentar recuperar os produtos.|
 
