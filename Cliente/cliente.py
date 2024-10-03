@@ -50,7 +50,7 @@ class Cliente:
         print(f"Olá, {self.nome_cliente}! Abaixo estão as opções disponíveis:")
 
         # Iniciar a thread de recebimento de mensagens do servidor
-        threading.Thread(target=self.receive_message).start()
+        threading.Thread(target=self.receive_message, daemon=True).start()
 
         # Loop principal do cliente
         while True:
@@ -96,12 +96,13 @@ class Cliente:
             try:
                 data = self.socket.recv(1024)
                 if not data:  # Verifica se a conexão foi fechada
+                    print("Conexão com o servidor encerrada.")
                     break
                 resposta = data.decode().split('@#')
 
                 if resposta[0] == 'PROD-220':
                     # Exibir produtos com tabulate
-                    produtos = [p.split('#') for p in resposta[1:][0].split('##')]
+                    produtos = [p.split('#') for p in resposta[1].split('##')]
                     headers = ['ID', 'Nome', 'Preço', 'Quantidade']
                     self.produtos = {prod[0]: {'nome': prod[1], 'preco': float(prod[2]), 'estoque': int(prod[3])} for prod in produtos}
                     print(tabulate(produtos, headers, tablefmt="grid"))
@@ -112,6 +113,10 @@ class Cliente:
                     print("\nCategorias disponíveis:")
                     categoria_table = [[categoria] for categoria in categorias if categoria.strip()]
                     print(tabulate(categoria_table, headers=['Categorias'], tablefmt="grid"))
+
+                elif resposta[0] == 'COMP-223':
+                    # Tratamento da mensagem de confirmação de compra
+                    print("\nCompra confirmada pelo servidor. Obrigado por usar nosso serviço!\n")
 
                 else:
                     print(f"Resposta não reconhecida: {resposta[0]}")
@@ -142,6 +147,8 @@ class Cliente:
                 self.carrinho[produto_id] = quantidade
 
             print(f"Produto {produto_id} adicionado ao carrinho.")
+        except ValueError:
+            print("Por favor, insira uma quantidade válida.")
         except Exception as e:
             print("Erro ao adicionar produto ao carrinho:", str(e))
 
@@ -171,16 +178,19 @@ class Cliente:
 
         confirmar = input("\nDeseja finalizar a compra? (s/n): ")
         if confirmar.lower() == 's':
-            # Enviar os detalhes da compra ao servidor
-            compra = ';'.join([f"{prod_id}:{qtd}" for prod_id, qtd in self.carrinho.items()])
-            self.socket.sendall(f'COMPRAR {compra}'.encode())
+            try:
+                # Enviar os detalhes da compra ao servidor
+                compra = ';'.join([f"{prod_id}:{qtd}" for prod_id, qtd in self.carrinho.items()])
+                self.socket.sendall(f'COMPRAR {compra}'.encode())
 
-            # Atualizar o estoque localmente
-            for prod_id, qtd in self.carrinho.items():
-                self.produtos[prod_id]['estoque'] -= qtd
+                # Atualizar o estoque localmente
+                for prod_id, qtd in self.carrinho.items():
+                    self.produtos[prod_id]['estoque'] -= qtd
 
-            self.carrinho.clear()
-            print("Compra finalizada com sucesso! Obrigado por comprar conosco.")
+                self.carrinho.clear()
+                print("Compra finalizada com sucesso! Obrigado por comprar conosco.")
+            except Exception as e:
+                print("Erro ao finalizar a compra:", str(e))
         else:
             print("Compra cancelada.")
 
