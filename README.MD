@@ -78,20 +78,22 @@ Aqui está a documentação das mensagens trocadas entre o cliente e o servidor:
 
 Siga os passos abaixo para executar a aplicação cliente-servidor:
 
-### 1. Executar o Servidor
+### Linux e Windows
+#### 1. Executar o Servidor
 No terminal, acesse o diretório do projeto e execute o seguinte comando para iniciar o servidor:
 
-`python .\Servidor\servidor.py`
+`python ./Servidor/servidor.py`
 
 Após isso, o servidor será aberto
 
-### 2. Executar o Cliente
+#### 2. Executar o Cliente
 
-`python .\Cliente\cliente.py`
+`python ./Cliente/cliente.py`
+
 
 Após isso, o cliente será  aberto e será conectado ao servidor
 
-### 3. Execução do codigo
+#### 3. Execução do codigo
 
 Irá aparecer uma mensagem de boas vindas e perguntará o nome do usuario
 
