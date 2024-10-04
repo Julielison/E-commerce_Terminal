@@ -36,6 +36,14 @@ O sistema proposto é uma plataforma de e-commerce que permite que clientes visu
 | `LinearProbingLoadFactor.py` | Contém a HashTable usada para guardar os produtos e também os métodos, códigos de erro, sucesso, e funções associadas ao protocolo.
 | `listaEncadeada.py` | Contém a lista simplesmente simplesmente encadeada, usada para armazenar os objetos de cada categoria. |
 
+## Estruturas de dados usadas
+### Cliente
+- HashTable
+
+### Servidor
+- HashTable
+- Lista simplesmente encadeada
+
 ## Pré-requisitos para Execução
 - Python versão 3.12.1 ou superior
 - Antes de executar a aplicação, certifique-se de ter os seguintes pacotes instalados:
