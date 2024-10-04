@@ -36,7 +36,7 @@ class Estoque:
         esses dados na tabela de hash e na lista de categorias.
         """
         # Conectar ao banco de dados SQLite
-        conn = sqlite3.connect('Servidor\Estoque\data_base.db')
+        conn = sqlite3.connect('Servidor/Estoque/data_base.db')
         cursor = conn.cursor()
         comando = Sql.categorias()
 
