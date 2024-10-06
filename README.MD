@@ -1,4 +1,4 @@
-# Sistema de E-commerce
+# Sistema de E-commerce | Projeto interdisciplinar
 
 <!-- Substitua pelo título do seu projeto, por exemplo: "Sistema de E-commerce com Cliente-Servidor" -->
 
